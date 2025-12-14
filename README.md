@@ -2,7 +2,7 @@
 Data analysis project focusing on Market Basket Analysis, cross-selling and bundling strategy using SQL and Looker Studio for visualization   
 ## 📊 About Dataset
 This is Online Transactional Data from company primarily based in the United Kingdom (UK).
-- **Link Dataset (Original Source):** [[Dataset]([url](https://drive.google.com/file/d/18WGYMmuTrGOCmhVGXZ35i8FE2WNwQ96N/view?usp=sharing))]
+- **Link Dataset (Original Source):** [Dataset](https://drive.google.com/file/d/18WGYMmuTrGOCmhVGXZ35i8FE2WNwQ96N/view?usp=sharing)
 - **Rows (Raw):** 541,909
 - **Column Details**: The dataset contains 8 core columns, categorized as follows:
     * **`InvoiceNo`** (6-digit string): Invoice number. If the code starts with 'C', it indicates a cancellation or refund.
@@ -20,7 +20,7 @@ You can preview it right below and click into the link for a live version.
 
 <img width="832" height="726" alt="image" src="https://github.com/user-attachments/assets/2751dadf-d0f3-44b4-a097-5993e1558cf1" />
 
-[🔗View Live Dashboard]([url](https://lookerstudio.google.com/reporting/afbc812a-137b-4dfc-85ff-7df9fa464cd1))  
+[🔗View Live Dashboard](https://lookerstudio.google.com/reporting/afbc812a-137b-4dfc-85ff-7df9fa464cd1)
 ## 🎯 Business Goals & Problem Solved
 **1. Section 1: Excutive Overview**
 **2. Section 2: Product Ecosystem & Bundling**
