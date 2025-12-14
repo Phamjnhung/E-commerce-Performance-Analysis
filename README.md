@@ -22,7 +22,7 @@ You can preview it right below and click into the link for a live version.
 
 [🔗View Live Dashboard](https://lookerstudio.google.com/reporting/afbc812a-137b-4dfc-85ff-7df9fa464cd1)
 ## 🎯 Business Goals & Problem Solved
-**1. Section 1: Excutive Overview**
+**1. Section 1: Excutive Overview**  
 **2. Section 2: Product Ecosystem & Bundling**
 - **Size:** What is the average basket size (items per order)?
 - **Rank:** Which product pairs have the most repeated purchased rates?
