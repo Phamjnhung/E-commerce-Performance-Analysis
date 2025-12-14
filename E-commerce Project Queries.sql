@@ -1,18 +1,17 @@
 CREATE DATABASE Ecommerce_Project;
-
 /* =============================================
-   PROJECT: E-COMMERCE ANALYSIS
-   AUTHOR: []
+   PROJECT: E-COMMERCE PERFORMANCE ANALYSIS
+   AUTHOR: [Pham Hong Nhung]
    DATE: [1/12/2025]
    GOAL: Product affinity analysis, cross-sell opportunities, bundle recommendations, purchase pattern discovery
    ============================================= */
 ------------------------------------------------
 USE Ecommerce_Project; 
-
+------------------------------------------------
 -- A. EXPLORING DATA 
 -- ---------------------------------------------
 -- 1. Total invoices, unique products, unique customers
--- Goal: Get an overview of the dataset volume
+-- GOAL: Get an overview of the dataset volume
 SELECT 
     COUNT(DISTINCT InvoiceNo) AS Total_Invoice,
     COUNT(DISTINCT CustomerID) AS Unique_Customer,
@@ -32,7 +31,7 @@ QUICK INSIGHTS:
      -------------------------------------------*/
 
 -- 2. Date range validation
--- Goal: Identify the time period to check the seasonality and missing month. 
+-- GOAL: Identify the time period to check the seasonality and missing month. 
 SELECT
     MIN(InvoiceDate) AS First_Date,
     MAX(InvoiceDate) AS Last_Date,
@@ -52,7 +51,7 @@ QUICK INSIGHTS:
        -----------------------------------------*/
 
 -- 3. Check for nulls in CustomerID
--- Goals: Identify how many missing value in the dataset
+-- GOAL: Identify how many missing value in the dataset
 SELECT 
     COUNT(*) AS Total_Rows,
     COUNT(CustomerID) AS Total_Customer,
@@ -72,7 +71,7 @@ QUICK INSIGHTS:
       ------------------------------------------*/
 
 -- 4. Identify cancellations (InvoiceNo starting with 'C')
--- Goals: Check how many transactions have been cancelled.
+-- GOAL: Check how many transactions have been cancelled.
 SELECT 
     COUNT(*) AS Total_Trans,
     SUM(CASE WHEN InvoiceNo LIKE 'C%' THEN 1 ELSE 0 END) AS Total_Cancellations,
@@ -96,7 +95,7 @@ GO
 -- B. PROFILING DATA
 -- ---------------------------------------------
 -- 1. Basket size distribution
--- Goal: Calculate the average number of item buying per order to detect B2B, Wholesales 
+-- GOAL: Calculate the average number of item buying per order to detect B2B, Wholesales 
 ; WITH Basket_Stats AS (
     SELECT 
       InvoiceNo,
@@ -131,7 +130,7 @@ QUICK INSIGHTS:
     -------------------------------------------*/
 
 -- 2. Most frequently purchased products
--- Goal: Identify the most popular products based on transactions count,
+-- GOAL: Identify the most popular products based on transactions count,
 SELECT TOP 10
    StockCode,
    Description,
@@ -160,7 +159,7 @@ QUICK INSIGHTS:
   -------------------------------------------*/     
 
 -- 3. Revenue distribution by product
--- Goal: Identify the product producing the most revenue (Cash Cow)
+-- GOAL: Identify the product producing the most revenue (Cash Cow)
 SELECT TOP 10
   StockCode,
   Description,
@@ -190,7 +189,7 @@ QUICK INSIGHTS:
   -------------------------------------------*/     
 
 -- 4. Order frequency by day of week, hour
--- Goal: Identify the peak trading time
+-- GOAL: Identify the peak trading time
 SELECT 
   DATENAME(weekday, InvoiceDate) day_of_week,
   DATEPART(hour, InvoiceDate) as Hour_of_day,
@@ -389,8 +388,8 @@ QUICK INSIGHTS:
   -------------------------------------------*/   
 GO 
 -- E. ANALYZING DATA
--- GOAL: 
--- METHOD: 
+-- GOAL: Extract key product, customer, and geographical insights to drive business strategy.
+-- METHOD: Apply Association Rule Mining metrics (Lift, Confidence and Support) and perform customer segmentation.
 ---------------------------------------------
 -- 1. Identify top 10 product pairs by Lift
 DECLARE @Total_Orders DECIMAl (10,2)
@@ -464,7 +463,7 @@ ORDER BY Number_of_connection DESC;
    ----------------------------------------------------------- */
 
 -- 3. Segment baskets: small (1-2 items), medium (3-5), large (6+)
--- Goal: Understand customer buying habits (Do they buy just 1 item or a whole cart?)
+-- GOAL: Understand customer buying habits (Do they buy just 1 item or a whole cart?)
 ; WITH Basket_Stats AS (
     SELECT 
       InvoiceNo, 
@@ -599,3 +598,4 @@ SELECT
 FROM Cleaned_Ecommerce
 GROUP BY DATEPART(Month, InvoiceDate), Description
 ORDER BY Item_Sold DESC;
+
