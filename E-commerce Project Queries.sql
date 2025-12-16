@@ -554,48 +554,98 @@ GO
 ---------------------------------------------
 -- 1. Total Revenue (Scorecard Metric)
 SELECT 
-    SUM(Quantity * UnitPrice) AS Total_Revenue
+   SUM(Quantity * UnitPrice) AS Total_Revenue
 FROM Cleaned_Ecommerce;
 
 -- 2. Overall AOV (Scorecard Metric)
 SELECT
-    SUM(Quantity * UnitPrice) / COUNT(DISTINCT InvoiceNo) AS Overall_AOV
+   SUM(Quantity * UnitPrice) / COUNT(DISTINCT InvoiceNo) AS Overall_AOV
 FROM Cleaned_Ecommerce;
 
 -- 3. Core Volume Metrics (Scorecard Metrics)
 SELECT
-    SUM(Quantity) AS Total_Unit_Sold,
-    COUNT(DISTINCT StockCode) AS Unique_Product,
-    COUNT(DISTINCT InvoiceNo) AS Total_Order
+   SUM(Quantity) AS Total_Unit_Sold,
+   COUNT(DISTINCT StockCode) AS Unique_Product,
+   COUNT(DISTINCT InvoiceNo) AS Total_Order
 FROM Cleaned_Ecommerce;
 
 -- 4. Revenue Trend and Daily Metrics
  SELECT
-    CAST(InvoiceDate AS DATE) AS Date,
-    Country,
-    COUNT(DISTINCT InvoiceNo) AS Total_Orders,
-    COUNT(DISTINCT CustomerID) AS Active_Customers,
-    SUM(Quantity * UnitPrice) AS Revenue,
-    SUM(Quantity * UnitPrice) / COUNT(DISTINCT InvoiceNo) AS AOV
+   CAST(InvoiceDate AS DATE) AS Date,
+   Country,
+   COUNT(DISTINCT InvoiceNo) AS Total_Orders,
+   COUNT(DISTINCT CustomerID) AS Active_Customers,
+   SUM(Quantity * UnitPrice) AS Revenue,
+   SUM(Quantity * UnitPrice) / COUNT(DISTINCT InvoiceNo) AS AOV
 FROM Cleaned_Ecommerce
 GROUP BY CAST(InvoiceDate AS DATE), Country
 ORDER BY 1 DESC;
 
--- 5. Top 10 Best Seller
+-- 5. Top 10 Revenue Contributors
 SELECT TOP 10
-    StockCode,
-    Description,
-    SUM(Quantity) AS Item_Sold
+   StockCode,
+   Description,
+   SUM(Quantity) AS Item_Sold,
+   SUM(Quantity * UnitPrice) AS Total_Revenue 
 FROM Cleaned_Ecommerce
 GROUP BY StockCode, Description
 ORDER BY Item_Sold DESC;
 
--- 6. Products Sales By Month (Seasonal Line Chart)
+-- 6. Order per Customer and Customer Type
+WITH CustomerFirstPurchase AS (
+   SELECT
+      CustomerID,
+      MIN(InvoiceDate) AS FirstOrderDate
+   FROM Cleaned_Ecommerce
+   GROUP BY CustomerID
+),
+OrderSegment AS (
+   SELECT
+      T.InvoiceNo,
+      T.Quantity * T.UnitPrice AS Revenue,
+      CASE
+         WHEN T.InvoiceDate = F.FirstOrderDate THEN 'New Customer'
+         ELSE 'Returning Customer'
+      END AS Customer_Type_at_Transaction
+    FROM
+      Cleaned_Ecommerce T
+    JOIN
+      CustomerFirstPurchase F ON T.CustomerID = F.CustomerID
+)
+SELECT
+   (SELECT CAST(COUNT(DISTINCT InvoiceNo) * 1.0 / COUNT(DISTINCT CustomerID) AS DECIMAL(10,2)) FROM Cleaned_Ecommerce) AS Orders_Per_Customer_Scorecard,
+   Customer_Type_at_Transaction,
+   COUNT(InvoiceNo) AS Total_Orders,
+   CAST(SUM(Revenue) AS DECIMAL(10,2)) AS Total_Revenue
+FROM
+   OrderSegment
+GROUP BY
+   Customer_Type_at_Transaction;
+
+-- 7. Product Portfolio
+WITH ProductTotals AS (
+   SELECT 
+      StockCode, 
+      SUM(Quantity * UnitPrice) AS TotalProductRevenue
+   FROM Cleaned_Ecommerce
+   GROUP BY StockCode
+),
+ABC_Mapping AS (
+   SELECT 
+      StockCode,
+      CASE 
+         WHEN TotalProductRevenue > 50000 THEN 'Group A (Strategic Core)'
+         WHEN TotalProductRevenue > 10000 THEN 'Group B (Steady Support)'
+         ELSE 'Group C (Low Value/Tail)'
+      END AS ABC_Class
+   FROM ProductTotals
+)
 SELECT 
-    DATEPART(Month, InvoiceDate) AS Month,
-    Description,
-    SUM(Quantity) AS Item_Sold
-FROM Cleaned_Ecommerce
-GROUP BY DATEPART(Month, InvoiceDate), Description
-ORDER BY Item_Sold DESC;
+   T.*, 
+   (T.Quantity * T.UnitPrice) AS Revenue,
+   M.ABC_Class
+FROM Cleaned_Ecommerce T
+JOIN ABC_Mapping M ON T.StockCode = M.StockCode;
+
+
 
